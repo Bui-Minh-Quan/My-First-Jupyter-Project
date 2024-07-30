@@ -9,11 +9,9 @@ def start_screen(stdscr):
     stdscr.refresh()
     stdscr.getkey()
 
-
-
 def display_text(stdscr, target, current, wpm = 0):
     stdscr.addstr(target)
-    stdscr.addstr(1, 0,f"{wpm} words per minute")
+    stdscr.addstr(1, 0, f"{wpm} words per minute")
 
     for i, char in enumerate(current):
         if char == target[i]:
@@ -31,11 +29,11 @@ def wpm_test(stdscr):
         while running:
             target_text = file.readline().strip()
             current_text = []
-            while True:
-                if not target_text:
+            if not target_text:
                     break #end of the file reached
-
-                if len(target_text) <= len(current_text) or target_text[len(current_text)] == " ":
+            
+            while True:
+                if len(current_text) > 0 and target_text[len(current_text) - 1] == " ":
                     words += 1
                 time_elapsed = max(time.time() - start_time, 1)
                 wpm = round(words / (time_elapsed / 60)) 
@@ -51,7 +49,7 @@ def wpm_test(stdscr):
                 if key == "\x1b":
                     running = False
                     break
-                if key == '\x7f' or key == '\b':
+                if key in ('\x7f', '\b', curses.KEY_BACKSPACE):
                     if len(current_text) > 0:
                         current_text.pop()
                 else:
