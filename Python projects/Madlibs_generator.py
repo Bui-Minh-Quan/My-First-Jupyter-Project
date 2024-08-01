@@ -1,4 +1,4 @@
-with open("story.txt", "r") as f:
+with open("Python projects\story.txt", "r") as f:
     story = f.read()
 
 

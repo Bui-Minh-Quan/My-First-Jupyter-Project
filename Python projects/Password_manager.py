@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
 
 def load_key():
-    file = open("key.key", "rb")
+    file = open("Python projects\key.key", "rb")
     key = file.read()
     file.close()
     return key
@@ -10,7 +10,7 @@ key = load_key()
 fer = Fernet(key)
 
 def view():
-    with open("password.txt", "r") as f:
+    with open("Python projects\password.txt", "r") as f:
         for line in f.readlines():
             data = line.rstrip()
             name, password = data.split("|")
