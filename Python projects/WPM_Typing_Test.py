@@ -1,5 +1,4 @@
 import curses
-import random
 import time
 from curses import wrapper
 
@@ -9,9 +8,9 @@ def start_screen(stdscr):
     stdscr.refresh()
     stdscr.getkey()
 
-def display_text(stdscr, target, current, wpm = 0):
+def display_text(stdscr, target, current, wpm = 0, accuracy_rate = 0):
     stdscr.addstr(target)
-    stdscr.addstr(1, 0, f"{wpm} words per minute")
+    stdscr.addstr(1, 0, f"{wpm} words per minute | Accuracy rate: {accuracy_rate}%")
 
     for i, char in enumerate(current):
         if char == target[i]:
@@ -19,28 +18,53 @@ def display_text(stdscr, target, current, wpm = 0):
         else:
             stdscr.addstr(0, i, target[i], curses.color_pair(2))
 
+def correct_words_calculate(target_text, user_text):
+    if len(target_text) == 0:
+        return 0
+    diff_check = False
+    number_of_correct_words = 0
+    for i in range(len(user_text)):
+        if target_text[i] == " " or i == len(user_text) - 1: # reach a space or end of the line
+            if diff_check == False:
+                number_of_correct_words += 1
+            diff_check = False
+            continue
+        if target_text[i] != user_text[i]:
+            diff_check = True
+    return number_of_correct_words
+        
 
 def wpm_test(stdscr):
     running = True
     wpm = 0
     start_time = time.time()
-    words = 0
+    total_words = 0
+    correct_words = 0
+    accuracy_rate = 0
     with open("typing_test_story.txt", "r") as file:
         while running:
+            words_in_line = 0
             target_text = file.readline().strip()
             current_text = []
             if not target_text:
                     break #end of the file reached
-            
+            space_positions = []
+            for i, char in enumerate(target_text):
+                if char == " ":
+                    space_positions.append(i)
             while True:
-                if len(current_text) > 0 and target_text[len(current_text) - 1] == " ":
-                    words += 1
+                try:
+                    words_in_line = space_positions.index(len(current_text)) + 1
+                except:
+                    pass
                 time_elapsed = max(time.time() - start_time, 1)
-                wpm = round(words / (time_elapsed / 60)) 
+                wpm = round((total_words + words_in_line) / (time_elapsed / 60)) 
                 stdscr.clear()
                 if len(current_text) >= len(target_text):
+                    words_in_line += 1
+                    total_words += words_in_line
                     break
-                display_text(stdscr, target_text, current_text, wpm)
+                display_text(stdscr, target_text, current_text, wpm, accuracy_rate)
 
                 stdscr.refresh()
 
@@ -54,6 +78,14 @@ def wpm_test(stdscr):
                         current_text.pop()
                 else:
                     current_text.append(key)
+            
+            current_text = "".join(current_text)
+            correct_words += correct_words_calculate(target_text, current_text)
+            if (total_words == 0):
+                accuracy_rate = 0
+            else: 
+                accuracy_rate = round((correct_words / total_words) * 100) 
+            
 
 
 
