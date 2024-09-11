@@ -1,7 +1,13 @@
 {
     "cSpell.words": [
         "addstr",
+        "astype",
+        "camelcase",
+        "dataframe",
+        "dtype",
         "Fernet",
-        "getkey"
+        "getkey",
+        "ndim",
+        "ndmin"
     ]
 }
